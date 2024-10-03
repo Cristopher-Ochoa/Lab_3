@@ -111,6 +111,16 @@ La frecuencia dominante durante la contracción muscular fue de [indicar frecuen
 El análisis estadístico arrojó un p-valor de [p_value], lo que indica que [explicar conclusiones en función del resultado del test t].
 Este estudio sugiere que la señal EMG cambia significativamente durante la contracción muscular, lo cual es consistente con la literatura sobre la actividad muscular medida mediante electromiografía
 
+Anexos
+Este repositorio incluye los siguientes archivos para reproducir el análisis completo:
+
+lab_3.py: Código completo con la lectura de los datos, filtrado, ventana, transformada de Fourier y análisis estadístico.
+emg_data.csv: Archivo CSV con los datos EMG adquiridos durante el experimento.
+plots/: Carpeta que contiene gráficos generados durante el análisis.
+
+![Figure_Lab_3](https://github.com/user-attachments/assets/988728da-eda8-4f65-834d-5f000345ccb1)
+
+
 
 
 
