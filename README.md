@@ -1,60 +1,51 @@
-Informe de Análisis de Señal EMG
-Este informe presenta el análisis de una señal EMG (Electromiografía) simulada, que incluye:
+Informe de Análisis de Señal EMG Real
+Este informe presenta el análisis de una señal EMG adquirida durante un experimento en el cual se midió la actividad muscular del bíceps durante un periodo de contracción. El análisis incluye:
 
-Generación de la señal con contracción muscular en el brazo.
-Aplicación de un filtro pasa-bajas para eliminar el ruido de alta frecuencia.
-Aplicación de una ventana de Hamming para mejorar el análisis en el dominio de la frecuencia.
-Transformada de Fourier para observar las frecuencias dominantes.
-Análisis estadístico utilizando un test t para comparar la media de las frecuencias entre reposo y contracción muscular.
+Descripción del experimento y adquisición de la señal EMG.
+Procesamiento de la señal mediante filtrado pasa-bajas.
+Aplicación de una ventana de Hamming para análisis espectral.
+Transformada de Fourier (FFT) para análisis en el dominio de la frecuencia.
+Análisis estadístico usando un test de hipótesis para evaluar la diferencia en la frecuencia media entre los periodos de reposo y contracción muscular.
 Tabla de contenido
-Descripción del problema
-Generación de la señal EMG
+Descripción del experimento
+Preprocesamiento de la señal
 Filtro y ventana
 Transformada de Fourier
 Análisis estadístico
 Conclusiones
 Anexos
-Descripción del problema
-Se requiere simular una señal EMG para un músculo del brazo, en este caso el bíceps, que presente una contracción entre los segundos 2 y 3. A partir de la señal, se aplica un análisis que incluye:
+Descripción del experimento
+El experimento se llevó a cabo para medir la actividad electromiográfica (EMG) del bíceps braquial de un sujeto mientras realizaba una contracción muscular. El proceso consistió en:
 
-Filtrado de la señal.
-Aplicación de una ventana de Hamming.
-Análisis en el dominio de la frecuencia mediante Transformada de Fourier (FFT).
-Análisis estadístico para determinar si existe una diferencia significativa en las frecuencias medias entre la señal en reposo y durante la contracción.
-Generación de la señal EMG
-La señal EMG simulada tiene las siguientes características:
+Adquisición de la señal: Se utilizó un dispositivo EMG que registró la señal a una frecuencia de muestreo de 1000 Hz. La duración total de la medición fue de 5 segundos.
+Condiciones del experimento:
+Reposo: Durante los primeros 2 segundos, el sujeto mantuvo el brazo relajado.
+Contracción muscular: Entre los segundos 2 y 3, el sujeto realizó una contracción máxima del bíceps.
+Reposo: A partir del segundo 3, el sujeto relajó nuevamente el músculo.
+La señal fue guardada en un archivo de datos para su posterior análisis.
 
-Frecuencia de muestreo: 1000 Hz.
-Duración: 5 segundos.
-Periodo de contracción: entre 2 y 3 segundos.
-Se utiliza una señal aleatoria para simular el ruido en reposo y se aumenta la amplitud durante la contracción para simular la activación muscular.
+Preprocesamiento de la señal
+La señal EMG adquirida contiene ruido debido a interferencias externas y artefactos biológicos. Por lo tanto, se aplicó un preprocesamiento para mejorar la calidad de la señal antes del análisis espectral y estadístico.
 
-El código para generar la señal EMG es el siguiente:
-
+Lectura de los datos: Los datos EMG fueron leídos desde un archivo CSV.
 python
 Copiar código
 import numpy as np
+import pandas as pd
 
-fs = 1000  # Frecuencia de muestreo en Hz
-tiempo_total = 5  # Duración total de la señal en segundos
-t = np.linspace(0, tiempo_total, fs * tiempo_total)  # Tiempo de muestreo
-reposo = np.random.normal(0, 0.1, len(t))  # Ruido en reposo
-contraccion = np.random.normal(0, 0.5, len(t))  # Ruido con contracción muscular
-
-inicio_contraccion = int(2 * fs)
-fin_contraccion = int(3 * fs)
-
-# Señal EMG sintética
-emg_signal = reposo.copy()
-emg_signal[inicio_contraccion:fin_contraccion] += contraccion[inicio_contraccion:fin_contraccion]
+# Cargar los datos EMG desde un archivo CSV
+data = pd.read_csv("emg_data.csv")
+t = data['Tiempo']  # Tiempo en segundos
+emg_signal = data['EMG']  # Señal EMG registrada
 Filtro y ventana
 Filtro Butterworth
-Se aplica un filtro pasa-bajas de tipo Butterworth para eliminar frecuencias superiores a 50 Hz y reducir el ruido de alta frecuencia.
+Dado que la señal EMG tiene componentes de alta frecuencia no deseadas, se aplicó un filtro pasa-bajas Butterworth con una frecuencia de corte de 50 Hz para eliminar el ruido de alta frecuencia.
 
 python
 Copiar código
 from scipy.signal import butter, filtfilt
 
+# Diseño del filtro pasa-bajas
 frecuencia_corte = 50
 rango_normalizado = frecuencia_corte / (0.5 * fs)
 orden = 4
@@ -63,54 +54,62 @@ orden = 4
 b, a = butter(orden, rango_normalizado, btype='low')
 emg_filtrada = filtfilt(b, a, emg_signal)
 Ventana de Hamming
-Aplicamos una ventana de Hamming para suavizar los efectos de borde y reducir el leakage en la Transformada de Fourier.
+Para realizar la Transformada de Fourier y mejorar la resolución en el dominio de la frecuencia, se aplicó una ventana de Hamming a la señal filtrada.
 
 python
 Copiar código
 ventana_hamming = np.hamming(len(emg_filtrada))
 emg_ventaneada = emg_filtrada * ventana_hamming
 Transformada de Fourier
-A continuación, se realiza la Transformada de Fourier (FFT) de las señales en reposo y durante la contracción para observar las componentes de frecuencia dominantes.
+Se utilizó la Transformada de Fourier (FFT) para observar las componentes de frecuencia dominantes en la señal tanto en reposo como durante la contracción muscular. La FFT nos permitió identificar las frecuencias más relevantes en ambos estados del músculo.
 
+Transformada de Fourier:
+Se extrajo la parte de la señal correspondiente al reposo y a la contracción.
+Se calcularon las frecuencias y las amplitudes de las componentes espectrales.
 python
 Copiar código
 from scipy.fft import fft, fftfreq
 
-# FFT para ambas señales
-fft_contraccion = fft(emg_ventaneada[inicio_contraccion:fin_contraccion])
-fft_reposo = fft(emg_ventaneada[:inicio_contraccion])
+# FFT durante la contracción
+inicio_contraccion = int(2 * fs)
+fin_contraccion = int(3 * fs)
+
+emg_contraccion = emg_ventaneada[inicio_contraccion:fin_contraccion]
+emg_reposo = emg_ventaneada[:inicio_contraccion]
+
+# Transformada de Fourier
+fft_contraccion = fft(emg_contraccion)
+fft_reposo = fft(emg_reposo)
 
 frecuencias_contraccion = fftfreq(len(fft_contraccion), 1/fs)
 frecuencias_reposo = fftfreq(len(fft_reposo), 1/fs)
-Las frecuencias dominantes y sus características serán evaluadas en la siguiente sección.
-
 Análisis estadístico
-Se aplica un test de hipótesis t-student para comparar las medias de las frecuencias dominantes entre la señal en reposo y durante la contracción.
+El análisis estadístico se realizó con el objetivo de determinar si existe una diferencia significativa entre las frecuencias medias de la señal EMG en reposo y durante la contracción muscular.
 
 Hipótesis
-H₀: No existe diferencia significativa entre las medias de las frecuencias.
-H₁: Existe una diferencia significativa en las medias de las frecuencias.
+H₀ (Hipótesis nula): No hay diferencia significativa entre las medias de las frecuencias en reposo y durante la contracción.
+H₁ (Hipótesis alternativa): Existe una diferencia significativa en las medias de las frecuencias entre reposo y contracción.
+Se realizó un test t-student para comparar las medias de las frecuencias en ambas condiciones.
+
 python
 Copiar código
 from scipy.stats import ttest_ind
 
-# Test t entre las frecuencias de reposo y contracción
+# Comparar las frecuencias de reposo y contracción
 t_stat, p_value = ttest_ind(frecuencias_reposo, frecuencias_contraccion)
 
-# Resultados del test
+# Resultados del test t
 print(f"T-statistic: {t_stat}")
 print(f"P-value: {p_value}")
+Si el valor p es menor que 0.05, se concluye que existe una diferencia significativa en las frecuencias medias.
+
 Conclusiones
-El análisis estadístico arrojó un p-valor de X, lo que indica que [explicar resultados según los valores obtenidos]. Con base en esto, podemos concluir que:
+Del análisis de la señal EMG, se puede concluir que:
 
-[Conclusión sobre el cambio en la frecuencia dominante durante la contracción].
-[Cualquier observación adicional sobre la señal EMG y su comportamiento].
-Anexos
-Este repositorio incluye los siguientes archivos que permiten reproducir el análisis completo:
-
-lab_3.py: Código completo que incluye la generación, filtrado, ventana, transformada de Fourier y análisis estadístico.
-señales.pdf: Documento con una explicación adicional sobre los fundamentos teóricos usados.
-plots/: Carpeta que contiene gráficos generados durante el análisis.
+[Explicar si se encontró o no una diferencia significativa en las frecuencias medias].
+La frecuencia dominante durante la contracción muscular fue de [indicar frecuencia], lo que es consistente con la activación del músculo bajo carga.
+El análisis estadístico arrojó un p-valor de [p_value], lo que indica que [explicar conclusiones en función del resultado del test t].
+Este estudio sugiere que la señal EMG cambia significativamente durante la contracción muscular, lo cual es consistente con la literatura sobre la actividad muscular medida mediante electromiografía
 
 
 
