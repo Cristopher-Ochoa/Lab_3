@@ -111,39 +111,6 @@ Este repositorio incluye los siguientes archivos que permiten reproducir el aná
 lab_3.py: Código completo que incluye la generación, filtrado, ventana, transformada de Fourier y análisis estadístico.
 señales.pdf: Documento con una explicación adicional sobre los fundamentos teóricos usados.
 plots/: Carpeta que contiene gráficos generados durante el análisis.
-Instrucciones para reproducir el trabajo
-Clona este repositorio:
-
-bash
-Copiar código
-git clone https://github.com/tu-usuario/nombre-del-repositorio.git
-Asegúrate de tener instaladas las dependencias:
-
-bash
-Copiar código
-pip install -r requirements.txt
-Ejecuta el archivo lab_3.py para generar los gráficos y obtener los resultados del análisis:
-
-bash
-Copiar código
-python lab_3.py
-Nota: El código es autocontenido, lo que significa que todas las bibliotecas y funciones necesarias están incluidas en los archivos del repositorio.
-
-Instrucciones para subir el proyecto a GitHub
-Crea un nuevo repositorio en GitHub.
-
-En tu máquina local, navega a la carpeta donde tienes el proyecto y ejecuta los siguientes comandos:
-
-bash
-Copiar código
-git init
-git add .
-git commit -m "Subir informe y código EMG"
-git remote add origin https://github.com/tu-usuario/nombre-del-repositorio.git
-git push -u origin master
-Esto te permitirá tener un informe autocontenido, con todo el código, gráficos y análisis estadístico, disponible en GitHub para que otros puedan reproducirlo.
-
-¿Te gustaría que te ayude con algún detalle específico del código o con los pasos para configurar el repositorio en GitHub?
 
 
 
